@@ -12,6 +12,27 @@ function converToStarsArray(stars){
   return array;
 }
 
+function convertToCastString(casts){
+  var castsjoin = "";
+  for(var idx in casts){
+    castsjoin = castsjoin + casts[idx].name + " / ";
+  }
+  return castsjoin.substring(0,castsjoin.length-3);
+}
+
+function convertToCastInfos(casts){
+  var castsArray = [];
+  for(var idx in casts){
+    var cast = {
+      img:casts[idx].avatars?casts[idx].avatars.large:"",
+      name:casts[idx].name
+    };
+    castsArray.push(cast);
+  }
+  return castsArray;
+}
+
+
 //网络请求获取数据
 function http(url,callBack){
   wx.request({
@@ -29,5 +50,7 @@ function http(url,callBack){
 
 module.exports = {
   converToStarsArray: converToStarsArray,
+  convertToCastInfos: convertToCastInfos,
+  convertToCastString: convertToCastString,
   http:http
 }

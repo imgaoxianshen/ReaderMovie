@@ -5,7 +5,10 @@ Page({
   data: {
     inTheaters: {},
     comingsoon: {},
-    top250: {}
+    top250: {},
+    searchResult:{},
+    containerShow: true,
+    searchPannelShow: false
   },
 
   onLoad: function (options) {
@@ -14,9 +17,9 @@ Page({
     var top250Url = app.globaleData.g_urlbase + "/v2/movie/top250" + "?start=0&count=3";
 
     //向服务器发送请求，
-    this.getMovieListData(inTheatersUrl, "inTheaters","正在热映");
-    this.getMovieListData(comingsoonUrl, "comingsoon","即将上映");
-    this.getMovieListData(top250Url, "top250","Top:250");
+    this.getMovieListData(inTheatersUrl, "inTheaters", "正在热映");
+    this.getMovieListData(comingsoonUrl, "comingsoon", "即将上映");
+    this.getMovieListData(top250Url, "top250", "Top:250");
   },
 
 
@@ -67,11 +70,37 @@ Page({
     readyData[settedKey] = { movies: movies, categoryTitle: categoryTitle };
     this.setData(readyData);
   },
-  onMoreTap:function(event){
+  onMoreTap: function (event) {
     var category = event.currentTarget.dataset.category;
     wx.navigateTo({
-      url: 'more-movie/more-movie?category='+category,
+      url: 'more-movie/more-movie?category=' + category,
     });
+  },
+  onBindFocus: function (event) {
+    this.setData({
+      containerShow: false,
+      searchPannelShow: true
+    })
+  },
+  onCancleTap: function (event) {
+    this.setData({
+      containerShow: true,
+      searchPannelShow: false,
+      // searchResult:{}
+    });
+  },
+  onBindChange: function (event) {
+    var text = event.detail.value;
+    var searchUrl = app.globaleData.g_urlbase+"/v2/movie/search?q="+text;
+    this.getMovieListData(searchUrl,"searchResult","");
+
+       
+  },
+  onMovieTap:function(event){
+    var movieId = event.currentTarget.dataset.movieid;
+    wx.navigateTo({
+      url: 'movie-detail/movie-detail?movieId='+movieId,
+    })
   },
 
 

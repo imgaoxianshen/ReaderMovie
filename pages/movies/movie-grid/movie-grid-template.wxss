@@ -1,5 +1,6 @@
 @import '../movie/movie-template.wxss';
 .movie-grid-container{
+  height:1300rpx;
   margin:40rpx 0 40rpx 7rpx;
 }
 

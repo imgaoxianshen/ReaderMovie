@@ -3,7 +3,9 @@ var util = require("../../../utils/util.js");
 
 Page({
   data: {
-    movies:{},
+    movies: {},
+    totalCount: 0,
+    isEmpty: true,
   },
   onLoad: function (options) {
     var category = options.category;
@@ -25,10 +27,13 @@ Page({
         break;
     }
 
+    this.setData({ requestUrl: dataUrl });
+
     util.http(dataUrl, this.processDoubanData)
 
   },
   processDoubanData: function (movieDouban) {
+    var that = this;
     var movies = [];
     for (var idx in movieDouban.subjects) {
       var subject = movieDouban.subjects[idx];
@@ -48,9 +53,41 @@ Page({
 
       movies.push(temp);
 
-    }  
-    this.setData({movies:movies});
+    }
+    var totalMovies = {};
+    if (!this.data.isEmpty) {
+      totalMovies = this.data.movies.concat(movies);
+    } else {
+      totalMovies = movies;
+      this.setData({isEmpty:false})
+    }
+    this.setData({
+      movies: totalMovies,
+      totalCount: that.data.totalCount + 20
+    });
+    wx.stopPullDownRefresh();
+    wx.hideNavigationBarLoading();
   },
+  // onScrollLower: function (event) {
+  //   wx.showNavigationBarLoading()
+  //   var nextUrl = this.data.requestUrl + "?start=" + this.data.totalCount + "&count=20";
+  //   // console.log(nextUrl);
+  //   util.http(nextUrl, this.processDoubanData);
+  //   wx.hideNavigationBarLoading()
 
+  // },
+
+  //页面移动到最下面自动调用
+  onReachBottom:function(event){
+    var nextUrl = this.data.requestUrl + "?start=" + this.data.totalCount + "&count=20";
+    util.http(nextUrl, this.processDoubanData);
+    wx.hideNavigationBarLoading();
+  },
+  onPullDownRefresh:function(event){
+    var refreshUrl = this.data.requestUrl + "?start=0"+ "&count=20";
+    this.setData({movies: {},isEmpty:true,totalCount:0});
+    util.http(refreshUrl, this.processDoubanData);
+    wx.showNavigationBarLoading()
+  },
 
 })
